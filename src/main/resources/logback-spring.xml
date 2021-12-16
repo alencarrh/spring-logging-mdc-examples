@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeContext>true</includeContext>
+            <includeMdc>true</includeMdc>
+            <timeZone>UTC</timeZone>
+            <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                <maxDepthPerThrowable>10</maxDepthPerThrowable>
+                <exclude>org\.springframework\..*</exclude>
+                <exclude>org\.apache.\.*</exclude>
+                <exclude>java\..*</exclude>
+                <exclude>javax\..*</exclude>
+                <exclude>jdk\..*</exclude>
+                <rootCauseFirst>true</rootCauseFirst>
+            </throwableConverter>
+        </encoder>
+    </appender>
+    <logger name="com.arh.logging.arhlogging" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>
