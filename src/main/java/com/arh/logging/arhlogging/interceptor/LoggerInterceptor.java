@@ -23,6 +23,8 @@ public class LoggerInterceptor extends OncePerRequestFilter {
   // pre controller headers
   private static final String SOURCE_IP = "request_ip";
   private static final String WALLET_ID = "x_wallet_id";
+
+  // do not log all headers because tokens and sensitive headers, log only necessary/known ones
   private static final Map<String, String> loggableHeaders =
       Map.of(
           "X-FORWARDED-FOR", SOURCE_IP,
@@ -31,7 +33,6 @@ public class LoggerInterceptor extends OncePerRequestFilter {
   // pos controller response
   private static final String DURATION = "request_duration";
   private static final String STATUS = "request_status";
-  private static final String EXCEPTION = "request_exception";
 
   @Override
   protected void doFilterInternal(
@@ -45,18 +46,13 @@ public class LoggerInterceptor extends OncePerRequestFilter {
     loggableHeaders.forEach(
         (headerName, logName) -> LoggerUtil.put(logName, request.getHeader(headerName)));
 
-    Class<?> exceptionClazz = null;
     try {
       filterChain.doFilter(request, response);
 
-    } catch (final Exception ex) {
-      exceptionClazz = ex.getCause().getClass();
-      throw ex;
     } finally {
 
       final long duration = System.currentTimeMillis() - init;
       LoggerUtil.put(DURATION, duration);
-      LoggerUtil.put(EXCEPTION, exceptionClazz);
       LoggerUtil.put(STATUS, response.getStatus());
 
       log.info(
